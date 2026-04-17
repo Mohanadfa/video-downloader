@@ -62,6 +62,11 @@ def download_video():
             "quiet": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
+            "extractor_args": {
+    "youtube": {
+        "player_client": ["android"]
+    }
+},
         }
 
         with yt_dlp.YoutubeDL(download_opts) as ydl:
