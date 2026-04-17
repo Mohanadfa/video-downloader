@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, url_for
+from flask import Flask, render_template, request, jsonify, send_file, after_this_request
 import yt_dlp
 import os
 import re
@@ -16,11 +16,13 @@ def safe_filename(name: str) -> str:
     name = re.sub(r"\s+", " ", name).strip()
     return name[:120] if name else "video"
 
+
 def clean_error_message(message: str) -> str:
     message = re.sub(r'\x1b\[[0-9;]*m', '', message)
     message = re.sub(r'\[[0-9;]+m', '', message)
     message = message.replace("ERROR:", "").strip()
     return message
+
 
 @app.route("/")
 def home():
@@ -38,7 +40,7 @@ def download_video():
     unique_id = str(uuid.uuid4())[:8]
 
     try:
-        # أولًا: نجيب المعلومات بدون تحميل
+        # نجيب معلومات الفيديو
         info_opts = {
             "quiet": True,
             "noplaylist": True,
@@ -52,52 +54,54 @@ def download_video():
         ext = info.get("ext", "mp4")
         output_template = os.path.join(DOWNLOAD_FOLDER, f"{title}-{unique_id}.%(ext)s")
 
-        # ثانيًا: نحمل الفيديو
+        # تحميل الفيديو
         download_opts = {
-    "format": "best",
-    "noplaylist": True,
-    "outtmpl": output_template,
-    "quiet": True,
-    "nocheckcertificate": True,
-    "geo_bypass": True,
-}
+            "format": "best",
+            "noplaylist": True,
+            "outtmpl": output_template,
+            "quiet": True,
+            "nocheckcertificate": True,
+            "geo_bypass": True,
+        }
 
         with yt_dlp.YoutubeDL(download_opts) as ydl:
             result = ydl.extract_info(video_url, download=True)
             final_path = ydl.prepare_filename(result)
 
-            # لو تم الدمج إلى mp4 قد يتغير الاسم النهائي
+            # لو تحول لـ mp4
             possible_mp4 = os.path.splitext(final_path)[0] + ".mp4"
             if os.path.exists(possible_mp4):
                 final_path = possible_mp4
 
-        filename = os.path.basename(final_path)
-        download_url = url_for("serve_download", filename=filename)
+        # 🧠 حذف الملف بعد الإرسال مباشرة
+        @after_this_request
+        def remove_file(response):
+            try:
+                if os.path.exists(final_path):
+                    os.remove(final_path)
+            except Exception as cleanup_error:
+                print(f"Cleanup error: {cleanup_error}")
+            return response
 
-        return jsonify({
-            "success": True,
-            "title": title,
-            "download_url": download_url,
-            "filename": filename
-        })
+        # 🔥 إرسال الملف مباشرة (بدون حفظ دائم)
+        return send_file(
+            final_path,
+            as_attachment=True,
+            download_name=os.path.basename(final_path)
+        )
 
     except Exception as e:
-     error_text = clean_error_message(str(e))
+        error_text = clean_error_message(str(e))
 
-     if "DRM protected" in error_text:
-        friendly_error = "هذا الفيديو محمي ولا يمكن تنزيله."
-     else:
-        friendly_error = f"صار خطأ أثناء التحميل: {error_text}"
+        if "DRM protected" in error_text:
+            friendly_error = "هذا الفيديو محمي ولا يمكن تنزيله."
+        else:
+            friendly_error = f"صار خطأ أثناء التحميل: {error_text}"
 
-    return jsonify({
-        "success": False,
-        "error": friendly_error
-    }), 500
-
-
-@app.route("/downloads/<path:filename>")
-def serve_download(filename):
-    return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
+        return jsonify({
+            "success": False,
+            "error": friendly_error
+        }), 500
 
 
 if __name__ == "__main__":

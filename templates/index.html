@@ -16,7 +16,7 @@
 
       <h1>تحميل فيديو من رابط</h1>
       <p class="subtitle">
-        الصق الرابط ثم اضغط تحميل. بعد تجهيز الملف بيطلع لك زر تحميل مباشر.
+        الصق الرابط ثم اضغط تحميل. بعد تجهيز الملف سيبدأ التنزيل مباشرة.
       </p>
 
       <div class="form-box">
@@ -32,12 +32,6 @@
       </div>
 
       <div id="statusBox" class="status hidden"></div>
-
-      <div id="resultBox" class="result hidden">
-        <h3>الملف جاهز</h3>
-        <p id="videoTitle"></p>
-        <a id="downloadLink" class="download-link" href="#" target="_blank">تحميل الفيديو</a>
-      </div>
     </section>
   </main>
 
@@ -45,9 +39,6 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const videoUrl = document.getElementById("videoUrl");
     const statusBox = document.getElementById("statusBox");
-    const resultBox = document.getElementById("resultBox");
-    const videoTitle = document.getElementById("videoTitle");
-    const downloadLink = document.getElementById("downloadLink");
 
     function showStatus(message, type = "info") {
       statusBox.className = `status ${type}`;
@@ -55,17 +46,8 @@
       statusBox.classList.remove("hidden");
     }
 
-    function hideStatus() {
-      statusBox.classList.add("hidden");
-    }
-
-    function hideResult() {
-      resultBox.classList.add("hidden");
-    }
-
     downloadBtn.addEventListener("click", async () => {
       const url = videoUrl.value.trim();
-      hideResult();
 
       if (!url) {
         showStatus("حط رابط الفيديو أول", "error");
@@ -74,7 +56,7 @@
 
       downloadBtn.disabled = true;
       downloadBtn.textContent = "جاري التجهيز...";
-      showStatus("يتم معالجة الرابط وتحميل الملف، انتظر شوي...", "loading");
+      showStatus("يتم تجهيز الفيديو، انتظر شوي...", "loading");
 
       try {
         const response = await fetch("/download", {
@@ -85,16 +67,31 @@
           body: JSON.stringify({ url })
         });
 
-        const data = await response.json();
+        const contentType = response.headers.get("content-type") || "";
 
-        if (!response.ok || !data.success) {
+        if (!response.ok) {
+          const data = await response.json();
           throw new Error(data.error || "فشل التحميل");
         }
 
-        showStatus("تم تجهيز الفيديو بنجاح", "success");
-        videoTitle.textContent = data.title;
-        downloadLink.href = data.download_url;
-        resultBox.classList.remove("hidden");
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          throw new Error(data.error || "فشل التحميل");
+        }
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = "video.mp4";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(blobUrl);
+
+        showStatus("تم تنزيل الفيديو بنجاح", "success");
       } catch (error) {
         showStatus(error.message || "حدث خطأ غير متوقع", "error");
       } finally {
