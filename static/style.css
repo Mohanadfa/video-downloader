@@ -4,42 +4,43 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   direction: rtl;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(91, 33, 182, 0.15), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.18), transparent 35%),
-    linear-gradient(135deg, #0f172a, #111827 40%, #020617);
-  color: #f8fafc;
-  position: relative;
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.35), transparent 25%),
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.35), transparent 25%),
+    linear-gradient(135deg, #020617, #0f172a 50%, #020617);
+  color: #fff;
   overflow-x: hidden;
 }
 
+/* 🔮 Blur glow */
 .background-blur {
   position: fixed;
   border-radius: 999px;
-  filter: blur(90px);
-  opacity: 0.3;
+  filter: blur(120px);
+  opacity: 0.4;
   z-index: 0;
 }
 
 .blur-1 {
-  width: 220px;
-  height: 220px;
-  background: #7c3aed;
-  top: 60px;
-  right: 40px;
+  width: 300px;
+  height: 300px;
+  background: #8b5cf6;
+  top: 50px;
+  right: 50px;
 }
 
 .blur-2 {
-  width: 260px;
-  height: 260px;
+  width: 300px;
+  height: 300px;
   background: #2563eb;
-  bottom: 60px;
-  left: 30px;
+  bottom: 50px;
+  left: 50px;
 }
 
+/* 🧊 Container */
 .container {
   min-height: 100vh;
   display: grid;
@@ -49,161 +50,158 @@ body {
   z-index: 1;
 }
 
+/* 🧊 Glass card */
 .card {
   width: 100%;
-  max-width: 640px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  max-width: 700px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  padding: 40px 30px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 0 60px rgba(139, 92, 246, 0.2),
+    0 20px 80px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  position: relative;
 }
 
+/* 🔥 glow border */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  padding: 1px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* 🏷 badge */
 .badge {
-    display: block;
-    margin: 0 auto 16px auto;
-    text-align: center;
-
-    background: rgba(59, 130, 246, 0.16);
-    color: #bfdbfe;
-    border: 1px solid rgba(96, 165, 250, 0.25);
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 14px;
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
+/* 🧠 title */
 h1 {
-  margin: 0 0 10px;
-  font-size: 34px;
-  line-height: 1.2;
+  font-size: 38px;
+  margin-bottom: 10px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #fff, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* 📝 subtitle */
 .subtitle {
-  margin: 0 0 24px;
   color: #cbd5e1;
+  margin-bottom: 30px;
   line-height: 1.8;
 }
 
+/* 📦 form */
 .form-box {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  text-align: right;
 }
 
-label {
-  font-size: 15px;
-  color: #e2e8f0;
-}
-
+/* 🧾 input */
 input {
   width: 100%;
   padding: 16px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.06);
-  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: white;
   font-size: 15px;
   outline: none;
-}
-
-input::placeholder {
-  color: #94a3b8;
+  transition: 0.2s;
 }
 
 input:focus {
-  border-color: rgba(96, 165, 250, 0.7);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
 }
 
+/* 🚀 button */
 button {
-  margin-top: 6px;
-  padding: 15px 18px;
+  padding: 16px;
   border: none;
   border-radius: 16px;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: white;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+  transition: 0.2s;
 }
 
 button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(124, 58, 237, 0.6);
 }
 
 button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.status,
-.result {
-  margin-top: 18px;
-  border-radius: 16px;
-  padding: 16px;
-  line-height: 1.7;
+/* 📢 status */
+.status {
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease;
 }
 
-.status.info,
 .status.loading {
-  background: rgba(59, 130, 246, 0.12);
-  border: 1px solid rgba(96, 165, 250, 0.25);
-  color: #dbeafe;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .status.success {
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  color: #dcfce7;
+  background: rgba(34, 197, 94, 0.2);
 }
 
 .status.error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.25);
-  color: #fee2e2;
+  background: rgba(239, 68, 68, 0.2);
 }
 
-.result {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.10);
-}
-
-.result h3 {
-  margin: 0 0 10px;
-}
-
-.download-link {
-  display: inline-block;
-  margin-top: 10px;
-  text-decoration: none;
-  padding: 12px 18px;
-  border-radius: 14px;
-  background: #f8fafc;
-  color: #0f172a;
-  font-weight: bold;
-}
-
-.hidden {
-  display: none;
-}
-
-@media (max-width: 640px) {
-  .card {
-    padding: 20px;
-    border-radius: 20px;
+/* ✨ animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+/* 📱 mobile */
+@media (max-width: 600px) {
   h1 {
     font-size: 28px;
   }
 
-  .subtitle {
-    font-size: 15px;
-  }
-
-  input,
-  button {
-    font-size: 15px;
+  .card {
+    padding: 25px 18px;
   }
 }
